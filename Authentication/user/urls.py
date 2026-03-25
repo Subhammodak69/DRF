@@ -1,13 +1,47 @@
+"""
+user/urls.py
+============
+URL configuration for the ``user`` authentication app.
+
+All routes are mounted under ``/api/auth/`` by the project-level urls.py.
+
+Route Map
+---------
++----------------------------------+-------------------------------------+
+| URL Pattern                      | View                                |
++==================================+=====================================+
+| POST  register/                  | RegisterView                        |
+| POST  login/                     | LoginView                           |
+| POST  logout/                    | LogoutView                          |
+| GET   profile/                   | ProfileView                         |
+| GET   user/                      | UserIdentifyView                    |
+| POST  token/refresh/             | TokenRefreshView (SimpleJWT)        |
+| POST  blacklist/                 | TokenBlacklistView (SimpleJWT)      |
++----------------------------------+-------------------------------------+
+"""
+
 from django.urls import path
-from .views import RegisterView, LoginView, ProfileView, LogoutView, UserIdentifyView
-from rest_framework_simplejwt.views import TokenRefreshView,TokenBlacklistView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
+
+from user.views import (
+    RegisterView,
+    LoginView,
+    LogoutView,
+    ProfileView,
+    UserIdentifyView,
+)
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('profile/', ProfileView.as_view(), name='profile'),
-    path('user/', UserIdentifyView.as_view(), name='check_user'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('blacklist/', TokenBlacklistView.as_view(), name='token_blacklist')
+    # ── Authentication ───────────────────────────────────────────────────────
+    path("register/", RegisterView.as_view(), name="auth-register"),
+    path("login/",    LoginView.as_view(),    name="auth-login"),
+    path("logout/",   LogoutView.as_view(),   name="auth-logout"),
+
+    # ── Profile / Identity ───────────────────────────────────────────────────
+    path("profile/", ProfileView.as_view(),       name="auth-profile"),
+    path("user/",    UserIdentifyView.as_view(),   name="auth-user-identify"),
+
+    # ── Token Management (SimpleJWT built-in) ───────────────────────────────
+    path("token/refresh/", TokenRefreshView.as_view(),   name="token-refresh"),
+    path("blacklist/",     TokenBlacklistView.as_view(), name="token-blacklist"),
 ]
