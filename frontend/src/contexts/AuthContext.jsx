@@ -69,17 +69,17 @@ const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post('/login/', credentials);
       const loginData = response.data;
-      
+
       const { access, refresh } = loginData;
-      
-      // Store tokens first
+
+      // Store tokens
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-      
-      // ✅ Fetch complete user data (like your initAuth does)
+
+      // Fetch complete user data
       const userData = await fetchUserData(access);
-      
+
       if (userData) {
         setTokens({ access, refresh });
         setUser(userData);
@@ -89,26 +89,27 @@ const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
-      };
+      // Always read the normalised { error: '...' } key from backend
+      const message =
+        error.response?.data?.error ||
+        'Login failed. Please try again.';
+      return { success: false, error: message };
     }
   };
 
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/register/', userData);
-      return { 
-        success: true, 
-        message: 'Registered successfully. Please login.' 
+      await axios.post('/register/', userData);
+      return {
+        success: true,
+        message: 'Account created successfully. Please sign in.',
       };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Registration failed' 
-      };
+      const message =
+        error.response?.data?.error ||
+        'Registration failed. Please try again.';
+      return { success: false, error: message };
     }
   };
 
@@ -119,15 +120,11 @@ const AuthProvider = ({ children }) => {
         await axios.post('/logout/', { refresh });
       }
     } catch (error) {
-      console.log('Logout API error:', error);
+      // Ignore logout API errors — always clear local state
+      console.warn('Logout API error (ignored):', error?.response?.data?.error);
     } finally {
-      // Always clear local state
       localStorage.removeItem('access');
       localStorage.removeItem('refresh');
-      localStorage.removeItem('email');
-      localStorage.removeItem('username');
-      localStorage.removeItem('id');
-      
       setTokens(null);
       setUser(null);
       delete axios.defaults.headers.common['Authorization'];

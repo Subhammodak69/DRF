@@ -43,6 +43,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'EXCEPTION_HANDLER': 'user.exceptions.custom_exception_handler',
 }
 
 SIMPLE_JWT = {
@@ -131,3 +132,5 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
