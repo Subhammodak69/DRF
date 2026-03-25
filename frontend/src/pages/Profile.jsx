@@ -1,6 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
+import { toast } from 'react-toastify';
 
 const Profile = () => {
   const { user, profile, logout } = useAuth();
@@ -11,7 +12,11 @@ const Profile = () => {
   const fetchProfile = useCallback(async () => {
     setLoading(true);
     const data = await profile();
-    setProfileData(data);
+    if (data) {
+      setProfileData(data);
+    } else {
+      toast.error('Failed to load profile. Please try again.');
+    }
     setLoading(false);
   }, []);
 
@@ -19,14 +24,27 @@ const Profile = () => {
     fetchProfile();
   }, [fetchProfile]);
 
+  const handleRefresh = async () => {
+    setLoading(true);
+    const data = await profile();
+    if (data) {
+      setProfileData(data);
+      toast.success('Profile refreshed!');
+    } else {
+      toast.error('Could not refresh profile.');
+    }
+    setLoading(false);
+  };
+
   const handleLogout = async () => {
     await logout();
+    toast.success('Signed out successfully.');
     navigate('/login');
   };
 
   if (loading) {
     return (
-      <div className="bg-mesh flex items-center justify-center">
+      <div className="bg-mesh min-h-screen flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="spinner mx-auto mb-4"></div>
           <p className="text-primary-500 font-medium">Loading profile...</p>
@@ -36,14 +54,25 @@ const Profile = () => {
   }
 
   const displayUser = profileData || user;
-  const initials = (displayUser?.first_name?.[0] || '?') + (displayUser?.last_name?.[0] || '');
+  const initials = ((displayUser?.first_name?.[0] || '') + (displayUser?.last_name?.[0] || '')).toUpperCase() || '?';
 
   const infoItems = [
     { label: 'Email', value: displayUser?.email, icon: '✉️' },
     { label: 'User ID', value: `#${displayUser?.id}`, icon: '🔑' },
-    { label: 'Status', value: displayUser?.is_active ? 'Active' : 'Inactive', icon: '🟢',
-      badge: true, badgeColor: displayUser?.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500' },
-    { label: 'Member Since', value: displayUser?.date_joined ? new Date(displayUser.date_joined).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric'}) : '—', icon: '📅' },
+    {
+      label: 'Status',
+      value: displayUser?.is_active ? 'Active' : 'Inactive',
+      icon: '🟢',
+      badge: true,
+      badgeColor: displayUser?.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
+    },
+    {
+      label: 'Member Since',
+      value: displayUser?.date_joined
+        ? new Date(displayUser.date_joined).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '—',
+      icon: '📅'
+    },
   ];
 
   return (
@@ -56,10 +85,16 @@ const Profile = () => {
             <p className="text-slate-500">Manage your account details</p>
           </div>
           <div className="flex items-center space-x-3">
-            <Link to="/dashboard" className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium text-sm hover:border-primary-300 hover:text-primary-600 transition-all duration-300 hover:shadow-md">
+            <Link
+              to="/dashboard"
+              className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium text-sm hover:border-primary-300 hover:text-primary-600 transition-all duration-300 hover:shadow-md"
+            >
               Dashboard
             </Link>
-            <button onClick={handleLogout} className="px-5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-500 font-medium text-sm hover:bg-red-100 hover:border-red-200 transition-all duration-300">
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-500 font-medium text-sm hover:bg-red-100 hover:border-red-200 transition-all duration-300"
+            >
               Sign Out
             </button>
           </div>
@@ -72,15 +107,16 @@ const Profile = () => {
               <div className="orb w-[150px] h-[150px] bg-gradient-to-br from-primary-200/30 to-purple-200/20 -top-16 -right-16 animate-float" />
               <div className="relative z-10">
                 <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-glow mb-4">
-                  {initials.toUpperCase()}
+                  {initials}
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 mb-1">
                   {displayUser?.first_name} {displayUser?.last_name}
                 </h2>
                 <p className="text-sm text-slate-400 mb-5">{displayUser?.email}</p>
                 <button
-                  onClick={fetchProfile}
-                  className="btn-gradient w-full !py-2.5 text-sm"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className="btn-gradient w-full !py-2.5 text-sm disabled:opacity-50"
                 >
                   🔄 Refresh Profile
                 </button>

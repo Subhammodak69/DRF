@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -12,13 +12,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     const result = await login(credentials);
     if (result.success) {
+      toast.success('Welcome back! Logged in successfully.');
       navigate('/dashboard');
     } else {
-      setError(result.error);
+      toast.error(result.error || 'Login failed. Please check your credentials.');
     }
     setLoading(false);
   };
@@ -47,9 +47,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email Address
-              </label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -69,9 +67,7 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -89,16 +85,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Error */}
-            {error && (
-              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-scale-in">
-                <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-                <span className="text-sm text-red-600">{error}</span>
-              </div>
-            )}
-
             {/* Submit */}
             <button
               type="submit"
@@ -110,9 +96,7 @@ const Login = () => {
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Signing In...</span>
                 </span>
-              ) : (
-                'Sign In'
-              )}
+              ) : 'Sign In'}
             </button>
           </form>
 
@@ -123,7 +107,6 @@ const Login = () => {
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           </div>
 
-          {/* Sign Up Link */}
           <Link
             to="/register"
             className="block text-center w-full py-3 rounded-xl border-2 border-primary-200 text-primary-600 font-semibold hover:bg-primary-50 hover:border-primary-300 transition-all duration-300 hover:shadow-md"
@@ -132,7 +115,6 @@ const Login = () => {
           </Link>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-xs text-slate-400 mt-6 animate-fade-in-delay-2">
           Protected by enterprise-grade encryption
         </p>
