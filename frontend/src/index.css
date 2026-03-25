@@ -1,3 +1,255 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Base Styles ─────────────────────────────────── */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #f8fafc;
+    color: #1e293b;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.2);
+    color: #312e81;
+  }
+}
+
+/* ─── Custom Scrollbar ────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* ─── Animated Mesh Background ────────────────────── */
+@layer components {
+  .bg-mesh {
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(196, 181, 253, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(252, 211, 177, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(186, 230, 253, 0.1) 0%, transparent 50%),
+      linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+    min-height: 100vh;
+  }
+
+  .bg-auth {
+    background:
+      radial-gradient(ellipse at 30% 0%, rgba(129, 140, 248, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 100%, rgba(196, 181, 253, 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse at 0% 60%, rgba(252, 211, 177, 0.08) 0%, transparent 50%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    min-height: 100vh;
+  }
+
+  /* ─── Glass Card ──────────────────────────────────── */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 1.25rem;
+    box-shadow: 
+      0 8px 32px rgba(99, 102, 241, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    box-shadow: 
+      0 16px 48px rgba(99, 102, 241, 0.12),
+      0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .glass-card-static {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 1.25rem;
+    box-shadow: 
+      0 8px 32px rgba(99, 102, 241, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ─── Gradient Button ─────────────────────────────── */
+  .btn-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-gradient:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-gradient:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-gradient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ─── Input Styles ────────────────────────────────── */
+  .input-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(248, 250, 252, 0.8);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .input-modern:focus {
+    border-color: #818cf8;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(99, 102, 241, 0.08);
+  }
+
+  .input-modern::placeholder {
+    color: #94a3b8;
+  }
+
+  /* ─── Floating Orb Shapes ─────────────────────────── */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .orb-1 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, rgba(165, 180, 252, 0.4), rgba(196, 181, 253, 0.3));
+    top: -100px;
+    right: -80px;
+  }
+
+  .orb-2 {
+    width: 250px;
+    height: 250px;
+    background: linear-gradient(135deg, rgba(252, 211, 177, 0.3), rgba(254, 202, 202, 0.2));
+    bottom: -80px;
+    left: -60px;
+  }
+
+  .orb-3 {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, rgba(186, 230, 253, 0.3), rgba(165, 180, 252, 0.2));
+    top: 40%;
+    left: -100px;
+  }
+
+  /* ─── Gradient Text ───────────────────────────────── */
+  .text-gradient {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── Stat Card ───────────────────────────────────── */
+  .stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--card-accent, #6366f1), var(--card-accent-end, #8b5cf6));
+    border-radius: 3px 3px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .stat-card:hover {
+    border-color: rgba(129, 140, 248, 0.3);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .stat-card:hover::before {
+    opacity: 1;
+  }
+
+  /* ─── Loading Spinner ─────────────────────────────── */
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(99, 102, 241, 0.15);
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}

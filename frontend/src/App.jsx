@@ -5,7 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';  // ← ADD THIS IMPORT
+import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 
 function AppContent() {
@@ -13,14 +13,17 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
+        <div className="text-center animate-fade-in">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-primary-500 font-medium tracking-wide">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {isAuthenticated && <Navbar />}
       
       <Routes>

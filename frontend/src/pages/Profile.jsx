@@ -1,113 +1,116 @@
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
 
 const Profile = () => {
   const { user, profile, logout } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    const data = await profile();
+    setProfileData(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      const data = await profile();
-      setProfileData(data);
-      setLoading(false);
-    };
     fetchProfile();
-  }, [profile]);
+  }, [fetchProfile]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-xl text-gray-500">Loading profile...</div>
+      <div className="bg-mesh flex items-center justify-center">
+        <div className="text-center animate-fade-in">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-primary-500 font-medium">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
   const displayUser = profileData || user;
+  const initials = (displayUser?.first_name?.[0] || '?') + (displayUser?.last_name?.[0] || '');
+
+  const infoItems = [
+    { label: 'Email', value: displayUser?.email, icon: '✉️' },
+    { label: 'User ID', value: `#${displayUser?.id}`, icon: '🔑' },
+    { label: 'Status', value: displayUser?.is_active ? 'Active' : 'Inactive', icon: '🟢',
+      badge: true, badgeColor: displayUser?.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500' },
+    { label: 'Member Since', value: displayUser?.date_joined ? new Date(displayUser.date_joined).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric'}) : '—', icon: '📅' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">Profile</h1>
-              <p className="text-gray-500">Manage your account details</p>
-            </div>
-            <div className="space-x-2">
-              <Link
-                to="/dashboard"
-                className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={logout}
-                className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
-              >
-                Logout
-              </button>
+    <div className="bg-mesh pb-12">
+      <div className="max-w-4xl mx-auto px-6 pt-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 animate-fade-in">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">Profile</h1>
+            <p className="text-slate-500">Manage your account details</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Link to="/dashboard" className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium text-sm hover:border-primary-300 hover:text-primary-600 transition-all duration-300 hover:shadow-md">
+              Dashboard
+            </Link>
+            <button onClick={handleLogout} className="px-5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-500 font-medium text-sm hover:bg-red-100 hover:border-red-200 transition-all duration-300">
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-5 gap-6">
+          {/* Left: Profile Card */}
+          <div className="md:col-span-2 animate-slide-up">
+            <div className="glass-card p-8 text-center overflow-hidden relative">
+              <div className="orb w-[150px] h-[150px] bg-gradient-to-br from-primary-200/30 to-purple-200/20 -top-16 -right-16 animate-float" />
+              <div className="relative z-10">
+                <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-glow mb-4">
+                  {initials.toUpperCase()}
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 mb-1">
+                  {displayUser?.first_name} {displayUser?.last_name}
+                </h2>
+                <p className="text-sm text-slate-400 mb-5">{displayUser?.email}</p>
+                <button
+                  onClick={fetchProfile}
+                  className="btn-gradient w-full !py-2.5 text-sm"
+                >
+                  🔄 Refresh Profile
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Profile Card */}
-            <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-8 rounded-xl">
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-3xl font-bold">
-                    {displayUser?.first_name?.[0] || '?'}
-                    {displayUser?.last_name?.[0] || ''}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold mb-1">
-                  {displayUser?.first_name} {displayUser?.last_name}
-                </h2>
-                <p className="opacity-90">{displayUser?.email}</p>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span>User ID:</span>
-                  <span className="font-semibold">{displayUser?.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Account Status:</span>
-                  <span className={`font-semibold ${displayUser?.is_active ? 'text-green-200' : 'text-red-200'}`}>
-                    {displayUser?.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Member Since:</span>
-                  <span>{new Date(displayUser?.date_joined).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-gray-50 p-8 rounded-xl">
-              <h3 className="text-xl font-bold mb-6 text-gray-800">Quick Actions</h3>
+          {/* Right: Info */}
+          <div className="md:col-span-3 animate-slide-up-delay">
+            <div className="glass-card p-8">
+              <h3 className="text-lg font-bold text-slate-800 mb-5 flex items-center space-x-2">
+                <svg className="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                <span>Account Details</span>
+              </h3>
               <div className="space-y-3">
-                <button
-                  onClick={async () => {
-                    setLoading(true);
-                    const freshData = await profile();
-                    setProfileData(freshData);
-                    setLoading(false);
-                  }}
-                  disabled={loading}
-                  className="w-full bg-indigo-500 text-white py-3 px-4 rounded-lg hover:bg-indigo-600 disabled:opacity-50 transition flex items-center justify-center space-x-2"
-                >
-                  <span>🔄</span>
-                  <span>Refresh Profile</span>
-                </button>
-                <Link
-                  to="/dashboard"
-                  className="w-full block text-center bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition"
-                >
-                  Go to Dashboard
-                </Link>
+                {infoItems.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50/60 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-lg">{item.icon}</span>
+                      <span className="text-sm text-slate-500 font-medium">{item.label}</span>
+                    </div>
+                    {item.badge ? (
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${item.badgeColor}`}>{item.value}</span>
+                    ) : (
+                      <span className="text-sm font-semibold text-slate-800">{item.value}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
